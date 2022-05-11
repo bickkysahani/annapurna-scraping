@@ -8,8 +8,20 @@ def annapurna_scrape(search_term):
     while True:
         print("current page : ",page_number)
         url = f"https://bg.annapurnapost.com/api/search?title={search_term}&page={page_number}"
-        response = requests.get(url)
-        res = json.loads(response.text)
+        try:
+            response = requests.get(url)
+        except requests.exceptions.RequestException as e:
+            raise SystemExit(e)
+
+        if response.status_code == 200:
+            res = json.loads(response.text)
+        else:
+            #raise SystemExit(f"Error: {response.status_code}")
+            print("error in page number : ",page_number)
+            page_number += 1
+            continue
+        #res = json.loads(response.text)
+
         total_articles = res['data']['total']
         print("total articles : ",res['data']['total'])
         print("articles count in current page:", res['data']['count'])
@@ -18,13 +30,9 @@ def annapurna_scrape(search_term):
             listItems.extend(res['data']['items'])
             json.dump(listItems, f, indent=4, ensure_ascii=False,
                             separators=(',', ': '))
-                
-        # with open('response2.json', 'r') as f:
-        #     #read the json file
-        #     data = json.load(f)
-        #     print("Total articles saved :",len(data))
-        #     saved_articles = len(data)
-            
+    
+        print("Total articles saved :",len(listItems))   
+
         if len(listItems) == total_articles:
             print("No more pages")
             break
