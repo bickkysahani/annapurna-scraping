@@ -4,31 +4,16 @@ import json
 
 def annapurna_scrape(search_term):
     page_number = 1
-    listItems = []
-    articles_count = 0
+    #listItems = []
+    # articles_count = 0
     while True:
-        print("current page : ",page_number)
+        # print("current page : ",page_number)
         try: 
-            with open('response3.json', 'r') as f:
-                listItems = json.load(f)
-                for item in listItems:
-                 #print(item)
-                 for k,v in item.items():
-                     if k == 'page_number':
-                         #print(k)
-                         if item[k] == page_number:
-                            print("page number ", page_number , "data already exists")
-                            #print(page_number)
-                            page_number += 1
-                            print("current page : ",page_number)
-                            break
-                    
-                     else:
-                        pass
-                    
+            with open(f"{search_term}.json", 'r') as f:
+                data = json.load(f)
+                page_number = data['page']
         except:
-            print("No file found")
-            print("Creating new file")
+            data = {"page": 1, "articles": []}
         
         url = f"https://bg.annapurnapost.com/api/search?title={search_term}&page={page_number}"
         try:
@@ -40,24 +25,28 @@ def annapurna_scrape(search_term):
             res = json.loads(response.text)
         else:
             raise SystemExit(f"Error: {response.status_code}")
+            
 
         totalPage = res['data']['totalPage']
         total_articles = res['data']['total']
-        articles_count += res['data']['count']
+        # articles_count += res['data']['count']
         print("total articles : ",res['data']['total'])
-        print("articles count in current page:", res['data']['count'])
+        # print("articles count in current page:", res['data']['count'])
         # print(type(res))
      
         #listItems.append({'page_number': page_number, 'data': res['data']['items']})
-        dataItems = {'page_number': page_number, 'data': res['data']['items']}
-        listItems.append(dataItems)
+        # dataItems = {'page': page_number, 'articles': res['data']['items']}
+        # listItems.append(dataItems)
+        
+        data['articles'].extend(res['data']['items'])
+        data['page'] += 1
 
-        with open('response3.json', 'w') as f:
-            json.dump(listItems, f, indent=4, ensure_ascii=False,
+        with open(f"{search_term}.json", 'w') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False,
                              separators=(',', ': '))
        
-        print("Total articles saved :", articles_count)   
-        print("----------------------------")
+        print("Total articles saved :", len(data['articles']))   
+        # print("----------------------------")
         
 
         page_number += 1
@@ -69,5 +58,5 @@ def annapurna_scrape(search_term):
   
        
 
-term = 'शेरबहादुर देउवा'
+term = 'शेरबहादुर'
 annapurna_scrape(term)
