@@ -19,13 +19,13 @@ def annapurna_scrape(search_term):
             json.dump(listItems, f, indent=4, ensure_ascii=False,
                             separators=(',', ': '))
                 
-        with open('response2.json', 'r') as f:
-            #read the json file
-            data = json.load(f)
-            print("Total articles saved :",len(data))
-            saved_articles = len(data)
+        # with open('response2.json', 'r') as f:
+        #     #read the json file
+        #     data = json.load(f)
+        #     print("Total articles saved :",len(data))
+        #     saved_articles = len(data)
             
-        if saved_articles == total_articles:
+        if len(listItems) == total_articles:
             print("No more pages")
             break
 
