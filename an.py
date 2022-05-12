@@ -6,15 +6,15 @@ def annapurna_scrape(search_term):
     page_number = 1
     #listItems = []
     # articles_count = 0
+    try: 
+        with open(f"{search_term}.json", 'r') as f:
+            data = json.load(f)
+            page_number = data['page']
+    except:
+        data = {"page": 1, "articles": []}
+        
     while True:
         # print("current page : ",page_number)
-        try: 
-            with open(f"{search_term}.json", 'r') as f:
-                data = json.load(f)
-                page_number = data['page']
-        except:
-            data = {"page": 1, "articles": []}
-        
         url = f"https://bg.annapurnapost.com/api/search?title={search_term}&page={page_number}"
         try:
             response = requests.get(url)
